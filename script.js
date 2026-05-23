@@ -1,5 +1,12 @@
 const sheet = document.getElementById("sheet");
+let selectedItem = null;
 
+document.addEventListener("keydown", function(event) {
+  if ((event.key === "Delete" || event.key === "Backspace") && selectedItem) {
+    selectedItem.remove();
+    selectedItem = null;
+  }
+});
 function updateGrid() {
   const size = document.getElementById("gridSize").value;
   const color = document.getElementById("gridColor").value;
