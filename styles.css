@@ -1,170 +1,195 @@
-const sheet = document.getElementById("sheet");
-let selectedItem = null;
-
-document.addEventListener("keydown", function(event) {
-  if ((event.key === "Delete" || event.key === "Backspace") && selectedItem) {
-    selectedItem.remove();
-    selectedItem = null;
-  }
-});
-
-sheet.addEventListener("click", function() {
-  if (selectedItem) {
-    selectedItem.classList.remove("selected");
-    selectedItem = null;
-  }
-});
-
-function updateGrid() {
-  const size = document.getElementById("gridSize").value;
-  const color = document.getElementById("gridColor").value;
-
-  sheet.style.backgroundImage = `
-    linear-gradient(${color} 1px, transparent 1px),
-    linear-gradient(90deg, ${color} 1px, transparent 1px)
-  `;
-
-  sheet.style.backgroundSize = `${size}px ${size}px`;
+* {
+  box-sizing: border-box;
 }
 
-function selectItem(el) {
-  if (selectedItem) {
-    selectedItem.classList.remove("selected");
-  }
-
-  selectedItem = el;
-  selectedItem.classList.add("selected");
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #eef3fb;
+  color: #1f2937;
 }
 
-function addText(type) {
-  const text = document.getElementById("letterText").value || "А а";
-
-  const el = document.createElement("div");
-  el.className = `item text-item ${type === "dashed" ? "dashed" : ""}`;
-  el.textContent = text;
-  el.style.left = "120px";
-  el.style.top = "120px";
-
-  makeDraggable(el);
-  sheet.appendChild(el);
+.topbar {
+  height: 76px;
+  padding: 10px 24px;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
 }
 
-function addSticker(emoji) {
-  const el = document.createElement("div");
-  el.className = "item sticker-item";
-  el.textContent = emoji;
-  el.style.left = "200px";
-  el.style.top = "200px";
-
-  makeDraggable(el);
-  sheet.appendChild(el);
+.topbar h1 {
+  margin: 0;
+  color: #2563eb;
+  font-size: 28px;
 }
 
-function addTask() {
-  const el = document.createElement("div");
-  el.className = "item task";
-  el.textContent = "Обведи буквы и продолжи строку ✍️";
-  el.style.left = "80px";
-  el.style.top = "40px";
-
-  makeDraggable(el);
-  sheet.appendChild(el);
+.topbar p {
+  margin: 2px 0 0;
+  color: #6b7280;
+  font-size: 14px;
 }
 
-function addReward() {
-  const el = document.createElement("div");
-  el.className = "item reward";
-  el.textContent = "Молодец! ⭐";
-  el.style.left = "520px";
-  el.style.top = "980px";
-
-  makeDraggable(el);
-  sheet.appendChild(el);
+.top-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
-function makeDraggable(el) {
-  let shiftX = 0;
-  let shiftY = 0;
-
-  el.addEventListener("click", function(event) {
-    event.stopPropagation();
-    selectItem(el);
-  });
-
-  el.addEventListener("mousedown", function(event) {
-    event.preventDefault();
-    event.stopPropagation();
-
-    selectItem(el);
-
-    shiftX = event.clientX - el.getBoundingClientRect().left;
-    shiftY = event.clientY - el.getBoundingClientRect().top;
-
-    function moveAt(pageX, pageY) {
-      const sheetRect = sheet.getBoundingClientRect();
-
-      el.style.left = pageX - sheetRect.left - shiftX + "px";
-      el.style.top = pageY - sheetRect.top - shiftY + "px";
-    }
-
-    function onMouseMove(event) {
-      moveAt(event.clientX, event.clientY);
-    }
-
-    document.addEventListener("mousemove", onMouseMove);
-
-    document.addEventListener("mouseup", function() {
-      document.removeEventListener("mousemove", onMouseMove);
-    }, { once: true });
-  });
-
-  el.ondragstart = () => false;
+main {
+  display: flex;
+  height: calc(100vh - 76px);
 }
 
-function clearSheet() {
-  sheet.innerHTML = "";
-  selectedItem = null;
+.panel {
+  width: 320px;
+  background: white;
+  padding: 18px;
+  overflow-y: auto;
+  border-right: 1px solid #dbe2ef;
 }
 
-async function downloadPNG() {
-  const dataUrl = await htmlToImage.toPng(sheet);
-
-  const link = document.createElement("a");
-  link.download = "propisi-lab.png";
-  link.href = dataUrl;
-  link.click();
+.panel h2 {
+  font-size: 18px;
+  margin: 18px 0 10px;
+  color: #111827;
 }
 
-async function downloadPDF() {
-  const dataUrl = await htmlToImage.toPng(sheet);
-
-  const { jsPDF } = window.jspdf;
-  const pdf = new jsPDF("p", "mm", "a4");
-
-  pdf.addImage(dataUrl, "PNG", 0, 0, 210, 297);
-  pdf.save("propisi-lab.pdf");
+label {
+  display: block;
+  margin-top: 10px;
+  font-weight: bold;
+  font-size: 14px;
 }
 
-function downloadWord() {
-  const html = `
-    <html>
-      <head>
-        <meta charset="UTF-8">
-        <title>ПрописиLab</title>
-      </head>
-      <body>
-        <h1>ПрописиLab</h1>
-        <p>Лист создан в конструкторе прописей.</p>
-      </body>
-    </html>
-  `;
+input,
+textarea,
+select {
+  width: 100%;
+  margin: 7px 0 10px;
+  padding: 9px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  font-size: 15px;
+}
 
-  const blob = new Blob(["\ufeff", html], {
-    type: "application/msword"
-  });
+textarea {
+  min-height: 72px;
+  resize: vertical;
+}
 
-  const link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download = "propisi-lab.doc";
-  link.click();
+button {
+  border: none;
+  background: #2563eb;
+  color: white;
+  padding: 9px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  margin: 3px 2px;
+  font-weight: bold;
+}
+
+button:hover {
+  background: #1d4ed8;
+}
+
+button.danger {
+  background: #ef4444;
+}
+
+button.danger:hover {
+  background: #dc2626;
+}
+
+.stickers {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.stickers button {
+  font-size: 24px;
+  background: #eef2ff;
+  color: #111827;
+}
+
+.workspace {
+  flex: 1;
+  padding: 30px;
+  overflow: auto;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.sheet {
+  width: 794px;
+  height: 1123px;
+  background-color: white;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 12px 36px rgba(0,0,0,0.18);
+
+  background-image:
+    linear-gradient(#9ec5ff 1px, transparent 1px),
+    linear-gradient(90deg, #9ec5ff 1px, transparent 1px);
+  background-size: 45px 45px;
+}
+
+.item {
+  position: absolute;
+  cursor: move;
+  user-select: none;
+  white-space: pre-wrap;
+}
+
+.selected {
+  outline: 2px dashed #ef4444;
+  outline-offset: 6px;
+}
+
+.text-item {
+  font-size: 64px;
+  font-family: "Monotype Corsiva", "Segoe Script", "Comic Sans MS", cursive;
+  color: #222;
+  font-style: italic;
+  transform: skewX(-12deg);
+}
+
+.dashed {
+  color: transparent;
+  -webkit-text-stroke: 1.4px #8a8a8a;
+  opacity: 0.8;
+  letter-spacing: 3px;
+}
+
+.sticker-item {
+  font-size: 54px;
+}
+
+.task {
+  font-size: 26px;
+  background: #fff7ed;
+  border: 2px dashed #fb923c;
+  border-radius: 18px;
+  padding: 12px 18px;
+  max-width: 650px;
+}
+
+.reward {
+  font-size: 28px;
+  background: #ecfdf5;
+  border: 2px solid #22c55e;
+  border-radius: 18px;
+  padding: 12px 18px;
+}
+
+.hint {
+  margin-top: 20px;
+  padding: 12px;
+  background: #fefce8;
+  border: 1px solid #fde68a;
+  border-radius: 12px;
+  font-size: 14px;
 }
