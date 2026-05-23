@@ -10,30 +10,60 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js"></script>
 </head>
 <body>
-  <header>
-    <h1>ПрописиLab</h1>
-    <button onclick="downloadPNG()">Скачать PNG</button>
-    <button onclick="downloadPDF()">Скачать PDF</button>
-    <button onclick="downloadWord()">Скачать Word</button>
-    <button onclick="clearSheet()">Очистить</button>
+  <header class="topbar">
+    <div>
+      <h1>ПрописиLab</h1>
+      <p>Конструктор прописей, заданий и рабочих листов</p>
+    </div>
+
+    <div class="top-buttons">
+      <button onclick="downloadPNG()">PNG</button>
+      <button onclick="downloadPDF()">PDF</button>
+      <button onclick="downloadWord()">Word</button>
+      <button class="danger" onclick="clearSheet()">Очистить</button>
+    </div>
   </header>
 
   <main>
-    <aside>
+    <aside class="panel">
       <h2>Настройки листа</h2>
 
-      <label>Размер клетки</label>
-      <input type="range" id="gridSize" min="25" max="80" value="45" oninput="updateGrid()">
+      <label>Размер клетки: <span id="gridSizeValue">45</span> px</label>
+      <input type="range" id="gridSize" min="25" max="90" value="45" oninput="updateGrid()">
 
       <label>Цвет клетки</label>
       <input type="color" id="gridColor" value="#9ec5ff" oninput="updateGrid()">
 
+      <label>Тип листа</label>
+      <select id="sheetType" onchange="updateGrid()">
+        <option value="grid">Крупная клетка</option>
+        <option value="line">Линейка</option>
+        <option value="slant">Косая линия</option>
+      </select>
+
       <h2>Буквы</h2>
-      <input id="letterText" placeholder="Например: А а мама" value="А а">
+
+      <label>Текст букв</label>
+      <input id="letterText" value="А а" placeholder="Например: А а мама">
+
+      <label>Размер букв: <span id="letterSizeValue">64</span> px</label>
+      <input type="range" id="letterSize" min="24" max="120" value="64" oninput="updateValues()">
+
       <button onclick="addText('normal')">Обычная буква</button>
       <button onclick="addText('dashed')">Пунктирная буква</button>
 
+      <h2>Задание</h2>
+
+      <label>Текст задания</label>
+      <textarea id="taskText">Обведи буквы и продолжи строку ✍️</textarea>
+
+      <label>Размер задания: <span id="taskSizeValue">26</span> px</label>
+      <input type="range" id="taskSize" min="14" max="60" value="26" oninput="updateValues()">
+
+      <button onclick="addTask()">Добавить задание</button>
+
       <h2>Стикеры</h2>
+
       <div class="stickers">
         <button onclick="addSticker('⭐')">⭐</button>
         <button onclick="addSticker('🐱')">🐱</button>
@@ -41,11 +71,27 @@
         <button onclick="addSticker('🚀')">🚀</button>
         <button onclick="addSticker('🦖')">🦖</button>
         <button onclick="addSticker('🌈')">🌈</button>
+        <button onclick="addSticker('✍️')">✍️</button>
+        <button onclick="addSticker('❤️')">❤️</button>
       </div>
 
-      <h2>Приколюхи</h2>
-      <button onclick="addTask()">Добавить задание</button>
+      <label>Размер стикера: <span id="stickerSizeValue">54</span> px</label>
+      <input type="range" id="stickerSize" min="24" max="120" value="54" oninput="updateValues()">
+
+      <h2>Награда</h2>
+
+      <label>Текст награды</label>
+      <input id="rewardText" value="Молодец! ⭐">
+
+      <label>Размер награды: <span id="rewardSizeValue">28</span> px</label>
+      <input type="range" id="rewardSize" min="14" max="60" value="28" oninput="updateValues()">
+
       <button onclick="addReward()">Добавить награду</button>
+
+      <div class="hint">
+        <b>Как удалить элемент:</b><br>
+        нажми на элемент → появится красная рамка → нажми Delete или Backspace.
+      </div>
     </aside>
 
     <section class="workspace">
