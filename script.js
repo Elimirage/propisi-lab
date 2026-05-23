@@ -7,6 +7,14 @@ document.addEventListener("keydown", function(event) {
     selectedItem = null;
   }
 });
+
+sheet.addEventListener("click", function() {
+  if (selectedItem) {
+    selectedItem.classList.remove("selected");
+    selectedItem = null;
+  }
+});
+
 function updateGrid() {
   const size = document.getElementById("gridSize").value;
   const color = document.getElementById("gridColor").value;
@@ -17,6 +25,15 @@ function updateGrid() {
   `;
 
   sheet.style.backgroundSize = `${size}px ${size}px`;
+}
+
+function selectItem(el) {
+  if (selectedItem) {
+    selectedItem.classList.remove("selected");
+  }
+
+  selectedItem = el;
+  selectedItem.classList.add("selected");
 }
 
 function addText(type) {
@@ -69,12 +86,23 @@ function makeDraggable(el) {
   let shiftX = 0;
   let shiftY = 0;
 
-  el.addEventListener("mousedown", function (event) {
+  el.addEventListener("click", function(event) {
+    event.stopPropagation();
+    selectItem(el);
+  });
+
+  el.addEventListener("mousedown", function(event) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    selectItem(el);
+
     shiftX = event.clientX - el.getBoundingClientRect().left;
     shiftY = event.clientY - el.getBoundingClientRect().top;
 
     function moveAt(pageX, pageY) {
       const sheetRect = sheet.getBoundingClientRect();
+
       el.style.left = pageX - sheetRect.left - shiftX + "px";
       el.style.top = pageY - sheetRect.top - shiftY + "px";
     }
@@ -85,7 +113,7 @@ function makeDraggable(el) {
 
     document.addEventListener("mousemove", onMouseMove);
 
-    document.addEventListener("mouseup", function () {
+    document.addEventListener("mouseup", function() {
       document.removeEventListener("mousemove", onMouseMove);
     }, { once: true });
   });
@@ -95,6 +123,7 @@ function makeDraggable(el) {
 
 function clearSheet() {
   sheet.innerHTML = "";
+  selectedItem = null;
 }
 
 async function downloadPNG() {
@@ -126,7 +155,6 @@ function downloadWord() {
       <body>
         <h1>ПрописиLab</h1>
         <p>Лист создан в конструкторе прописей.</p>
-        <p>Для полноценного Word-экспорта позже можно добавить библиотеку docx.js.</p>
       </body>
     </html>
   `;
