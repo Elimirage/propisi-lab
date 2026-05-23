@@ -1,1 +1,58 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ПрописиLab</title>
+  <link rel="stylesheet" href="styles.css" />
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js"></script>
+</head>
+<body>
+  <header>
+    <h1>ПрописиLab</h1>
+    <button onclick="downloadPNG()">Скачать PNG</button>
+    <button onclick="downloadPDF()">Скачать PDF</button>
+    <button onclick="downloadWord()">Скачать Word</button>
+    <button onclick="clearSheet()">Очистить</button>
+  </header>
+
+  <main>
+    <aside>
+      <h2>Настройки листа</h2>
+
+      <label>Размер клетки</label>
+      <input type="range" id="gridSize" min="25" max="80" value="45" oninput="updateGrid()">
+
+      <label>Цвет клетки</label>
+      <input type="color" id="gridColor" value="#9ec5ff" oninput="updateGrid()">
+
+      <h2>Буквы</h2>
+      <input id="letterText" placeholder="Например: А а мама" value="А а">
+      <button onclick="addText('normal')">Обычная буква</button>
+      <button onclick="addText('dashed')">Пунктирная буква</button>
+
+      <h2>Стикеры</h2>
+      <div class="stickers">
+        <button onclick="addSticker('⭐')">⭐</button>
+        <button onclick="addSticker('🐱')">🐱</button>
+        <button onclick="addSticker('🍎')">🍎</button>
+        <button onclick="addSticker('🚀')">🚀</button>
+        <button onclick="addSticker('🦖')">🦖</button>
+        <button onclick="addSticker('🌈')">🌈</button>
+      </div>
+
+      <h2>Приколюхи</h2>
+      <button onclick="addTask()">Добавить задание</button>
+      <button onclick="addReward()">Добавить награду</button>
+    </aside>
+
+    <section class="workspace">
+      <div id="sheet" class="sheet"></div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
