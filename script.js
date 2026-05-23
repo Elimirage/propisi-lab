@@ -1,8 +1,64 @@
 const sheet = document.getElementById("sheet");
+
 let selectedItem = null;
+
+function updateValues() {
+  document.getElementById("letterSizeValue").textContent =
+    document.getElementById("letterSize").value;
+
+  document.getElementById("taskSizeValue").textContent =
+    document.getElementById("taskSize").value;
+
+  document.getElementById("stickerSizeValue").textContent =
+    document.getElementById("stickerSize").value;
+
+  document.getElementById("rewardSizeValue").textContent =
+    document.getElementById("rewardSize").value;
+}
+
+function updateGrid() {
+  const size = document.getElementById("gridSize").value;
+  const color = document.getElementById("gridColor").value;
+  const type = document.getElementById("sheetType").value;
+
+  document.getElementById("gridSizeValue").textContent = size;
+
+  if (type === "grid") {
+    sheet.style.backgroundImage = `
+      linear-gradient(${color} 1px, transparent 1px),
+      linear-gradient(90deg, ${color} 1px, transparent 1px)
+    `;
+    sheet.style.backgroundSize = `${size}px ${size}px`;
+  }
+
+  if (type === "line") {
+    sheet.style.backgroundImage = `
+      linear-gradient(${color} 1px, transparent 1px)
+    `;
+    sheet.style.backgroundSize = `100% ${size}px`;
+  }
+
+  if (type === "slant") {
+    sheet.style.backgroundImage = `
+      linear-gradient(${color} 1px, transparent 1px),
+      repeating-linear-gradient(105deg, transparent 0, transparent ${size}px, rgba(160,160,160,0.45) ${size + 1}px, transparent ${size + 2}px)
+    `;
+    sheet.style.backgroundSize = `100% ${size}px, ${size * 2}px ${size}px`;
+  }
+}
+
+function selectItem(el) {
+  if (selectedItem) {
+    selectedItem.classList.remove("selected");
+  }
+
+  selectedItem = el;
+  selectedItem.classList.add("selected");
+}
 
 document.addEventListener("keydown", function(event) {
   if ((event.key === "Delete" || event.key === "Backspace") && selectedItem) {
+    event.preventDefault();
     selectedItem.remove();
     selectedItem = null;
   }
@@ -15,73 +71,6 @@ sheet.addEventListener("click", function() {
   }
 });
 
-function updateGrid() {
-  const size = document.getElementById("gridSize").value;
-  const color = document.getElementById("gridColor").value;
-
-  sheet.style.backgroundImage = `
-    linear-gradient(${color} 1px, transparent 1px),
-    linear-gradient(90deg, ${color} 1px, transparent 1px)
-  `;
-
-  sheet.style.backgroundSize = `${size}px ${size}px`;
-}
-
-function selectItem(el) {
-  if (selectedItem) {
-    selectedItem.classList.remove("selected");
-  }
-
-  selectedItem = el;
-  selectedItem.classList.add("selected");
-}
-
-function addText(type) {
-  const text = document.getElementById("letterText").value || "А а";
-
-  const el = document.createElement("div");
-  el.className = `item text-item ${type === "dashed" ? "dashed" : ""}`;
-  el.textContent = text;
-  el.style.left = "120px";
-  el.style.top = "120px";
-
-  makeDraggable(el);
-  sheet.appendChild(el);
-}
-
-function addSticker(emoji) {
-  const el = document.createElement("div");
-  el.className = "item sticker-item";
-  el.textContent = emoji;
-  el.style.left = "200px";
-  el.style.top = "200px";
-
-  makeDraggable(el);
-  sheet.appendChild(el);
-}
-
-function addTask() {
-  const el = document.createElement("div");
-  el.className = "item task";
-  el.textContent = "Обведи буквы и продолжи строку ✍️";
-  el.style.left = "80px";
-  el.style.top = "40px";
-
-  makeDraggable(el);
-  sheet.appendChild(el);
-}
-
-function addReward() {
-  const el = document.createElement("div");
-  el.className = "item reward";
-  el.textContent = "Молодец! ⭐";
-  el.style.left = "520px";
-  el.style.top = "980px";
-
-  makeDraggable(el);
-  sheet.appendChild(el);
-}
-
 function makeDraggable(el) {
   let shiftX = 0;
   let shiftY = 0;
@@ -89,6 +78,18 @@ function makeDraggable(el) {
   el.addEventListener("click", function(event) {
     event.stopPropagation();
     selectItem(el);
+  });
+
+  el.addEventListener("dblclick", function(event) {
+    event.stopPropagation();
+
+    if (el.classList.contains("task") || el.classList.contains("reward") || el.classList.contains("text-item")) {
+      const newText = prompt("Измени текст:", el.textContent);
+
+      if (newText !== null) {
+        el.textContent = newText;
+      }
+    }
   });
 
   el.addEventListener("mousedown", function(event) {
@@ -121,12 +122,75 @@ function makeDraggable(el) {
   el.ondragstart = () => false;
 }
 
+function addText(type) {
+  const text = document.getElementById("letterText").value || "А а";
+  const size = document.getElementById("letterSize").value;
+
+  const el = document.createElement("div");
+  el.className = `item text-item ${type === "dashed" ? "dashed" : ""}`;
+  el.textContent = text;
+  el.style.fontSize = `${size}px`;
+  el.style.left = "120px";
+  el.style.top = "140px";
+
+  makeDraggable(el);
+  sheet.appendChild(el);
+}
+
+function addTask() {
+  const text = document.getElementById("taskText").value || "Обведи буквы и продолжи строку ✍️";
+  const size = document.getElementById("taskSize").value;
+
+  const el = document.createElement("div");
+  el.className = "item task";
+  el.textContent = text;
+  el.style.fontSize = `${size}px`;
+  el.style.left = "70px";
+  el.style.top = "50px";
+
+  makeDraggable(el);
+  sheet.appendChild(el);
+}
+
+function addSticker(emoji) {
+  const size = document.getElementById("stickerSize").value;
+
+  const el = document.createElement("div");
+  el.className = "item sticker-item";
+  el.textContent = emoji;
+  el.style.fontSize = `${size}px`;
+  el.style.left = "240px";
+  el.style.top = "240px";
+
+  makeDraggable(el);
+  sheet.appendChild(el);
+}
+
+function addReward() {
+  const text = document.getElementById("rewardText").value || "Молодец! ⭐";
+  const size = document.getElementById("rewardSize").value;
+
+  const el = document.createElement("div");
+  el.className = "item reward";
+  el.textContent = text;
+  el.style.fontSize = `${size}px`;
+  el.style.left = "520px";
+  el.style.top = "980px";
+
+  makeDraggable(el);
+  sheet.appendChild(el);
+}
+
 function clearSheet() {
   sheet.innerHTML = "";
   selectedItem = null;
 }
 
 async function downloadPNG() {
+  if (selectedItem) {
+    selectedItem.classList.remove("selected");
+  }
+
   const dataUrl = await htmlToImage.toPng(sheet);
 
   const link = document.createElement("a");
@@ -136,6 +200,10 @@ async function downloadPNG() {
 }
 
 async function downloadPDF() {
+  if (selectedItem) {
+    selectedItem.classList.remove("selected");
+  }
+
   const dataUrl = await htmlToImage.toPng(sheet);
 
   const { jsPDF } = window.jspdf;
@@ -154,7 +222,7 @@ function downloadWord() {
       </head>
       <body>
         <h1>ПрописиLab</h1>
-        <p>Лист создан в конструкторе прописей.</p>
+        <p>Word-версия страницы. Для печати лучше использовать PDF.</p>
       </body>
     </html>
   `;
@@ -168,3 +236,6 @@ function downloadWord() {
   link.download = "propisi-lab.doc";
   link.click();
 }
+
+updateValues();
+updateGrid();
